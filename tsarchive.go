@@ -33,8 +33,8 @@ var /* const */ tsRegex = regexp.MustCompile(tsRegexPattern)
 
 var (
 	rootDir, outputDir, archiveName string
-	weeklyFileWriter []*os.File
-	weeklyTarWriters map[time.Time]*tar.Writer
+	weeklyFileWriter                []*os.File
+	weeklyTarWriters                map[time.Time]*tar.Writer
 )
 
 func addFile(tw *tar.Writer, thePath string) error {
@@ -79,17 +79,16 @@ func getTimeFromFileTimestamp(thisFile string) (time.Time, error) {
 
 func getNameFromFilepath(thisFile string, sunday time.Time) string {
 	name := archiveName
-	if archiveName != ""{
+	if archiveName != "" {
 		timestamp := tsRegex.FindString(thisFile)
 		baseFile := path.Base(thisFile)
 		ext := path.Ext(baseFile)
 		filename := strings.TrimSuffix(baseFile, ext)
-		name = strings.Replace(filename, timestamp,"", 1)
+		name = strings.Replace(filename, timestamp, "", 1)
 	}
 	datedArchive := sunday.Format(archiveForm)
 	return fmt.Sprintf(datedArchive, name)
 }
-
 
 func truncateTimeToSunday(t time.Time) (sunday time.Time) {
 	return t.Truncate(time.Hour * 24 * 7)
@@ -109,7 +108,7 @@ func visit(filePath string, info os.FileInfo, _ error) error {
 	}
 
 	t, err := getTimeFromFileTimestamp(filePath)
-	if err != nil{
+	if err != nil {
 		ERRLOG("%s", err)
 		return nil
 	}
@@ -190,7 +189,6 @@ func init() {
 	}
 }
 
-
 func main() {
 
 	weeklyTarWriters = make(map[time.Time]*tar.Writer)
@@ -218,12 +216,12 @@ func main() {
 		}
 	}
 
-	for sunday, writer := range weeklyTarWriters{
+	for sunday, writer := range weeklyTarWriters {
 		ERRLOG("[tar] closing %s tar writer", sunday.Format("2006-01-02"))
 		writer.Close()
 	}
 
-	for i := range weeklyFileWriter{
+	for i := range weeklyFileWriter {
 		weeklyFileWriter[i].Close()
 	}
 
